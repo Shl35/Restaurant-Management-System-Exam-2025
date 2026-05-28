@@ -340,14 +340,16 @@ API
 |--------|-------|
 | Newman Collection JSON อยู่ที่ `tests/postman/` ใน Repository | ✅ |
 | `.github/workflows/cicd.yml` มี step ติดตั้งและรัน Newman | ✅ |
-| GitHub Actions Pipeline รันสำเร็จ (สีเขียว) | ✅ |
-| Newman Pass Rate บันทึกอยู่ใน Pipeline log | ✅ |
+| GitHub Actions Pipeline รันสำเร็จ (สีเขียว) | ❌ (ติดปัญหา GitHub Account Billing Lock) |
+| Newman Pass Rate บันทึกอยู่ใน Pipeline log | ❌ |
 
-**✏️ Newman Pass Rate จาก CI/CD:** 5 / 5 (100%)
+**✏️ Newman Pass Rate จาก CI/CD:** 0 / 5 (เนื่องจากติดปัญหา Billing Lock ของระบบ GitHub)
 
 **รูปที่ 4 — GitHub Actions Pipeline สำเร็จ (แสดง Newman step และ Pass Rate)**
 
 `![CI Pipeline Newman](./tests/reports/ci-pipeline-newman.png)`
+![alt text](image-5.png)
+(หมายเหตุ: สคริปต์สำหรับ CI/CD ในไฟล์ .github/workflows/ci.yml ได้รับการเซ็ตอัปถูกต้องตามสเปกครบถ้วนแล้ว แต่ระบบ GitHub Actions บน Cloud ปฏิเสธการทำงานเนื่องจากสิทธิ์ของบัญชีผู้ใช้ถูกล็อกในส่วนของ Billing)
 
 ---
 
@@ -367,19 +369,23 @@ cd backend && npm audit --audit-level=moderate
 |----------|-------|
 | Critical | 0 |
 | High | 0 |
-| Medium | 0 |
+| Medium | 3 |
 | Low | 0 |
-| **รวม** | 0 |
+| **รวม** | 3 |
 
 **✏️ กรอกรายละเอียด Dependency ที่มีช่องโหว่ระดับ High ขึ้นไป (ถ้าไม่มีให้ระบุ "ไม่พบช่องโหว่")**
 
-| Package | CVE ID | Severity | เวอร์ชันที่มีปัญหา | เวอร์ชันที่ปลอดภัย | สถานะการแก้ไข |
-|---------|--------|----------|--------------------|--------------------|--------------| 
-| | | | | | |
+#### รายละเอียด Dependency ที่มีช่องโหว่ (Backend)
+| Package | CVE ID / GHSA | Severity | เวอร์ชันที่มีปัญหา | เวอร์ชันที่ปลอดภัย | สถานะการแก้ไข |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| `qs` | GHSA-q8mj-m7cp-5q26 | Moderate | `6.11.1 - 6.15.1` | อัปเดตล่าสุด | มี Fix พร้อมแก้ไข (รัน `npm audit fix`) |
+
+
 
 **รูปที่ 5 — ผล npm audit Backend**
 
 `![Backend npm audit](./tests/reports/npm-audit-backend.png)`
+![alt text](image-6.png)
 
 ---
 
@@ -394,14 +400,15 @@ cd frontend && npm audit --audit-level=moderate
 | Severity | จำนวน |
 |----------|-------|
 | Critical | 0 |
-| High | 0 |
-| Medium | 0 |
+| High | 1 |
+| Medium | 2|
 | Low | 0 |
-| **รวม** | 0 |
+| **รวม** | 3 |
 
 **รูปที่ 6 — ผล npm audit Frontend**
 
 `![Frontend npm audit](./tests/reports/npm-audit-frontend.png)`
+![alt text](image-7.png)
 
 ### Security Scan ใน CI Pipeline (Rubric 1.7 ข้อ 4)
 
