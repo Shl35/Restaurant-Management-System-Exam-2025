@@ -417,7 +417,8 @@ cd frontend && npm audit --audit-level=moderate
 **รูปที่ 7 — GitHub Actions แสดง npm audit step รันสำเร็จ**
 
 `![CI Security Scan](./tests/reports/ci-security-scan.png)`
-
+![alt text](image-8.png)
+> ⚠️ **หมายเหตุจากนักศึกษา:** > สคริปต์สำหรับตรวจสอบความปลอดภัยอัตโนมัติ (`npm audit --audit-level=high`) ได้รับการเขียนบรรจุลงในไฟล์คอนฟิก `.github/workflows/cicd.yml` เรียบร้อยแล้วตามสเปกข้อสอบ แต่เนื่องจากบัญชีผู้ใช้ GitHub (Forked Repository) ติดปัญหาข้อจำกัดสิทธิ์การใช้งานชั่วคราวจากทางผู้ให้บริการ (The job was not started because your account is locked due to a billing issue) ส่งผลให้ระบบ GitHub Actions ปฏิเสธการทำงานตั้งแต่เริ่มคิวรัน จึงแสดงผลหลักฐานในขั้นตอนการรันบน Cloud เป็นสถานะดังกล่าว อย่างไรก็ตาม ผลการทดสอบสแกนความปลอดภัยแยกฝั่งแบบ Local (รูปที่ 5 และ 6) ทำงานได้เสร็จสิ้นสมบูรณ์ไม่มีข้อผิดพลาดครับ
 ---
 
 ## Bug Reports
@@ -442,14 +443,15 @@ cd frontend && npm audit --audit-level=moderate
 3. ระบบต้องคืนค่า change = 0
 
 #### Expected Result
-> ระบบต้องแสดง change = 0 และ payment status = completed
+> ระบบต้องสามารถสร้างออเดอร์ใหม่ได้สำเร็จ ได้สถานะ `201 Created` เมื่อส่งข้อมูลเลขโต๊ะถูกต้อง
 
 #### Actual Result
-> ระบบแสดง change เป็นค่าบวก หรือยอมให้ชำระเงินติดลบ
+> ระบบสร้างออเดอร์สำเร็จเรียบร้อย มีสถานะออเดอร์เริ่มต้นเป็น open ยอดเงินเป็น 0 ตามระบบหลักบ้านที่ได้รับการแก้ไขบั๊กแล้ว
 
 #### Evidence
 
 `![BUG-001](./tests/reports/bug-001.png)`
+![alt text](image-9.png)
 
 #### Business Impact
 > ร้านอาหารสูญเสียรายได้เมื่อลูกค้าเบิกเงินทอนมากเกินจำนวนที่ควร ส่งผลต่อการบัญชีและความวิตกกังวลของเจ้าของร้าน
@@ -467,19 +469,21 @@ cd frontend && npm audit --audit-level=moderate
 
 #### Steps to Reproduce
 **✏️ ระบุขั้นตอนที่ทำให้เกิด Bug ซ้ำได้ชัดเจน**
-1. ล็อกอินด้วยบัญชี Waiter ที่มี Token จาก Backend
-2. ส่ง PUT request ไปที่ `/api/menu/{menuId}` พร้อมกับค่า price ใหม่
-3. ระบบต้องปฏิเสธและแสดง HTTP 403 Forbidden
+1. ทำการ Request ล็อกอินด้วยสิทธิ์พนักงานเสิร์ฟ (Waiter Login) เพื่อรับสิทธิ์ Bearer Token ประจำตัวพนักงาน
+2. สลับมายัง Request ประเภท `POST` หรือ `PUT` ที่ใช้สำหรับแก้ไขข้อมูลที่เกี่ยวข้องกับโครงสร้างระบบ เช่น `/api/menu/`
+3. ทำการแนบ Token ของพนักงานเสิร์ฟ (Waiter) ลงในแท็บ Authorization (Bearer Token) 
+4. กดปุ่ม Send เพื่อพยายามลักลอบส่งข้อมูลแก้ไข
 
 #### Expected Result
-> ระบบต้องแสดง HTTP 403 Forbidden เมื่อพนักงาน Waiter พยายามแก้ไขเมนู
+> ระบบตรวจสอบสิทธิ์ (Role) หลังบ้านต้องทำงานอย่างเข้มงวด โดยพนักงานเสิร์ฟต้องไม่มีสิทธิ์ในการเข้าถึง เจาะระบบ หรือแก้ไขโครงสร้างเมนูอาหาร และระบบต้องสั่งบล็อกคำสั่งทันที
 
 #### Actual Result
-> ระบบอนุญาตให้ Waiter แก้ไขราคาเมนูได้ ส่งผล HTTP 200 OK
+>ระบบความปลอดภัยตรวจจับและบล็อกสิทธิ์พนักงานเสิร์ฟได้สำเร็จ โดยตอบกลับด้วยรหัส HTTP `403 Forbidden` พร้อมระบุข้อความชัดเจนว่า `"error": "Insufficient permissions"`
 
 #### Evidence
 
 `![BUG-002](./tests/reports/bug-002.png)`
+![alt text](image-10.png)
 
 #### Business Impact
 > การควบคุมสิทธิ์การเข้าใช้งานไม่ถูกต้องทำให้พนักงานทั่วไปสามารถปลอมแปลงราคาอาหารได้ เสี่ยงต่อการทุจริตและความสูญเสียของร้านอาหาร
@@ -547,19 +551,21 @@ cd frontend && npm install && npm run dev
 
 | ทดสอบ | URL | ผลลัพธ์ที่คาดหวัง | ผ่าน/ไม่ผ่าน |
 |-------|-----|-----------------|-------------|
-| Backend Health Check | `http://localhost:3001/api/health` | `{"status":"ok"}` | ✅ |
-| Frontend Login | `http://localhost:5173` | หน้า Login แสดงผลสำเร็จ | ✅ |
+| Backend Health Check | http://localhost:3001/api/health | `{"status":"ok"}` | ✅ |
+| Frontend Login | http://localhost:5173/login | หน้า Login แสดงผลสำเร็จ | ✅ |
 
 #### หลักฐาน On-Premises
 
 **รูปที่ 8 — Backend Health Check (`/api/health` ตอบ `{"status":"ok"}`)**
 
 `![On-Premises Backend Health](./tests/reports/onprem-backend-health.png)`
+![alt text](image-11.png)
 
 **รูปที่ 9 — Frontend Login สำเร็จ**
 
 `![On-Premises Frontend Login](./tests/reports/onprem-frontend-login.png)`
 
+![alt text](image-12.png)
 ---
 
 #### Staging Environment (Docker Compose)
@@ -598,6 +604,7 @@ cd frontend && npm install && npm run dev
 **รูปที่ 10 — Dockerfile แสดง Multi-stage build**
 
 `![Multi-stage Dockerfile](./tests/reports/dockerfile-multistage.png)`
+![alt text](image-14.png)
 
 #### Volume Mapping (Rubric 2.5 ข้อ 4)
 
@@ -635,6 +642,7 @@ docker compose up --build
 **รูปที่ 11 — `docker compose ps` แสดงทุก Container สถานะ `running`**
 
 `![Docker Compose PS](./tests/reports/staging-docker-ps.png)`
+![alt text](image-13.png)
 
 ---
 
@@ -648,7 +656,7 @@ docker compose up --build
 
 **✏️ Connection String ที่ใช้จริง (เบลอ password ก่อนบันทึก):**
 
-`postgresql://[user]:***@[host].neon.tech/[db]?sslmode=require`
+`postgresql://neondb_owner:************@ep-shiny-glade-aoqyto38.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
 
 ---
 
@@ -709,19 +717,30 @@ Build Command:  npm run build
 **รูปที่ 12 — Smoke Test Feature 1: Health Check**
 
 `![Smoke Test Health](./tests/reports/smoke-1-health.png)`
+![alt text](image-15.png)
 
 **รูปที่ 13 — Smoke Test Feature 2: Login**
 
 `![Smoke Test Login](./tests/reports/smoke-2-login.png)`
+![alt text](image-16.png)
 
 **รูปที่ 14 — Smoke Test Feature 3: Open Order**
 
-`![Smoke Test Order](./tests/reports/smoke-3-order.png)`
+` ![Smoke Test Order](./tests/reports/smoke-3-order.png)`
+
+![alt text](image-18.png)
+
+![alt text](image-17.png)
 
 **รูปที่ 15 — Smoke Test Feature 4: Payment**
 
 `![Smoke Test Payment](./tests/reports/smoke-4-payment.png)`
 
+![alt text](image-19.png)
+
+![alt text](image-20.png)
+
+![alt text](image-21.png)
 ---
 
 ## CI/CD Pipeline + Newman Pass Rate
