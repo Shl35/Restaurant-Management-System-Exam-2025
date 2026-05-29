@@ -770,8 +770,15 @@ Build Command:  npm run build
 
 **รูปที่ 16 — GitHub Actions Pipeline สำเร็จ (แสดง Newman Pass Rate ใน log)**
 
+
 `![CI/CD Pipeline](./tests/reports/cicd-pipeline-success.png)`
 
+![alt text](image-22.png)
+
+> ⚠️ **หมายเหตุสำหรับการทดสอบระบบบน Pipeline (DevOps Troubleshooting Note):**
+> - เนื่องด้วยบัญชี GitHub ที่ใช้ในการทดสอบ (Account: Shl35) ติดข้อจำกัดด้านความปลอดภัยและนโยบายการเรียกเก็บเงินชั่วคราวของทางแพลตฟอร์ม (GitHub Action Execution Blocked due to billing constraints) ทำให้ไม่สามารถประมวลผลคำสั่งผ่านเซิร์ฟเวอร์ของ GitHub Cloud Actions ได้ในเวลาที่กำหนด 
+> 
+>- ทางผู้พัฒนาจึงได้ทำการแก้ไขสถานการณ์เฉพาะหน้า โดยการจำลองสภาพแวดล้อม CI/CD Pipeline และรันชุดคำสั่งทดสอบ API ทั้งหมดผ่านเครื่องมือ **Newman CLI** ภายใน Local Environment โดยอ้างอิงโพยชุดทดสอบ `RMS-TestSuite-v2.json` และตัวแปรสภาพแวดล้อม `env-local.json` ชุดเดียวกันกับที่กำหนดไว้บนระบบอัตโนมัติทุกประการ ซึ่งผลการทดสอบสามารถทำงานร่วมกับ Backend และฐานข้อมูลจำลองได้สมบูรณ์ ผลลัพธ์ Pass Rate อยู่ที่ 100% (21/21 Requests Passed) ตามรายงานข้างต้น
 ---
 
 *Template สร้างจากข้อสอบปฏิบัติการทดสอบและติดตั้งระบบซอฟต์แวร์เชิงธุรกิจ — PRIME-BSD Model*
